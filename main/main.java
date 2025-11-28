@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 
 public class main {
     public static void main(String[] args) {
-        JFrame window = new JFrame("CaturAhmadRacing");
+        JFrame window = new JFrame("CaturUmgPBO");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
         panelgame gp = new panelgame();
