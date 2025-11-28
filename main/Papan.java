@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class Papan {
-    final int MAX_COL = 0;
-    final int MAX_ROW = 0;
+    final int MAX_COL = 8;
+    final int MAX_ROW = 8;
     public static final int KOTAK_SIZE = 100;
     public static final int HALF_KOTAK_SIZE = KOTAK_SIZE/2;
     
@@ -24,7 +24,7 @@ public class Papan {
                 }
                 g2.fillRect(col*KOTAK_SIZE, row*KOTAK_SIZE,KOTAK_SIZE,KOTAK_SIZE);
             }
-            
+
             if (c == 0){
                 c=1;
             }else {

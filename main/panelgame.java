@@ -44,7 +44,7 @@ public class panelgame extends JPanel implements Runnable{
         private void update () {
 
         }
-        public void painComponent (Graphics g){
+        public void paintComponent (Graphics g){
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D)g;
             papan.draw (g2);
