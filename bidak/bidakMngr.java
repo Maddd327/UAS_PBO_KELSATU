@@ -15,6 +15,15 @@ public class bidakMngr {
     setPieces();
   }
 
+  public BufferedImage getWhitePawnIcon() {
+    // asumsi sudah dimuat di constructor atau loadImages()
+    return this.whitePawn;
+  }
+
+  public BufferedImage getBlackPawnIcon() {
+    return this.blackPawn;
+  }
+
   private void loadImages() {
     whitePawn = imageLoader.load("img/bidak/W_pawn.png");
     whiteRook = imageLoader.load("img/bidak/W_rook.png");
