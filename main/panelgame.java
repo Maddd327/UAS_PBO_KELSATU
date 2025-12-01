@@ -11,8 +11,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.bidak.bidak;
-import main.bidak.bidakMngr;
+import bidak.bidak;
+import bidak.bidakMngr;
 
 public class panelgame extends JPanel implements Runnable {
     public static final int WIDTH = 1200;

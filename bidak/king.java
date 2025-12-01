@@ -1,12 +1,12 @@
-package main.bidak;
+package bidak;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.image.BufferedImage;
 
-public class knight extends bidak {
+public class king extends bidak {
 
-  public knight(BufferedImage img, int col, int row, boolean isWhite) {
+  public king(BufferedImage img, int col, int row, boolean isWhite) {
     super(img, col, row, isWhite);
   }
 
@@ -18,10 +18,10 @@ public class knight extends bidak {
       if (b != null)
         board[b.col][b.row] = b;
 
-    int[][] offsets = { { 1, 2 }, { 2, 1 }, { -1, 2 }, { -2, 1 }, { 1, -2 }, { 2, -1 }, { -1, -2 }, { -2, -1 } };
-    for (int[] off : offsets) {
-      int newCol = col + off[0];
-      int newRow = row + off[1];
+    int[][] directions = { { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, -1 }, { 0, 1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
+    for (int[] d : directions) {
+      int newCol = col + d[0];
+      int newRow = row + d[1];
       if (newCol >= 0 && newCol < 8 && newRow >= 0 && newRow < 8) {
         if (board[newCol][newRow] == null || board[newCol][newRow].isWhite != this.isWhite) {
           moves.add(new int[] { newCol, newRow });

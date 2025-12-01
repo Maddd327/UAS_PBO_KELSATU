@@ -1,4 +1,4 @@
-package main.bidak;
+package bidak;
 
 import java.util.ArrayList;
 import java.util.List;

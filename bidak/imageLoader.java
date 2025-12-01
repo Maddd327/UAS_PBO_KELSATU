@@ -1,4 +1,4 @@
-package main.bidak;
+package bidak;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

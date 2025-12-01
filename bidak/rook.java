@@ -1,8 +1,8 @@
-package main.bidak;
+package bidak;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.image.BufferedImage;
 
 public class rook extends bidak {
   public rook(BufferedImage img, int col, int row, boolean isWhite) {

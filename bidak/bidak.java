@@ -1,4 +1,4 @@
-package main.bidak;
+package bidak;
 
 import main.Papan;
 import java.awt.Graphics2D;

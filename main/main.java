@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 
 public class main {
     public static void main(String[] args) {
-        JFrame window = new JFrame("CaturUmgPBO Update");
+        JFrame window = new JFrame("CaturUmgPBO");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setExtendedState(JFrame.MAXIMIZED_BOTH); // fullscreen tapi tetap ada title bar
         window.setVisible(true);
