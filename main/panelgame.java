@@ -13,7 +13,6 @@ import java.util.List;
 
 import main.bidak.bidak;
 import main.bidak.bidakMngr;
-import main.bidak.pawn;
 
 public class panelgame extends JPanel implements Runnable {
     public static final int WIDTH = 1200;
