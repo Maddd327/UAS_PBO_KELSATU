@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 public class bidak {
   public BufferedImage img;
@@ -42,5 +43,9 @@ public class bidak {
             Papan.KOTAK_SIZE);
       }
     }
+  }
+
+  public List<int[]> getPossibleMoves(bidak[] allBidaks) {
+    return null; // di-override di subclass
   }
 }

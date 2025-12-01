@@ -7,10 +7,6 @@ public class bidakMngr {
 
   bidak[] bidaks = new bidak[32];
 
-  public bidak[] getAllBidaks() {
-    return bidaks;
-  }
-
   BufferedImage whitePawn, whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing;
   BufferedImage blackPawn, blackRook, blackKnight, blackBishop, blackQueen, blackKing;
 
@@ -47,30 +43,30 @@ public class bidakMngr {
     }
 
     // ===== ROOK =====
-    bidaks[index++] = new bidak(whiteRook, 0, 7, true);
-    bidaks[index++] = new bidak(whiteRook, 7, 7, true);
+    bidaks[index++] = new rook(whiteRook, 0, 7, true);
+    bidaks[index++] = new rook(whiteRook, 7, 7, true);
 
-    bidaks[index++] = new bidak(blackRook, 0, 0, false);
-    bidaks[index++] = new bidak(blackRook, 7, 0, false);
+    bidaks[index++] = new rook(blackRook, 0, 0, false);
+    bidaks[index++] = new rook(blackRook, 7, 0, false);
     // ===== KNIGHT =====
-    bidaks[index++] = new bidak(whiteKnight, 1, 7, true);
-    bidaks[index++] = new bidak(whiteKnight, 6, 7, true);
+    bidaks[index++] = new knight(whiteKnight, 1, 7, true);
+    bidaks[index++] = new knight(whiteKnight, 6, 7, true);
 
-    bidaks[index++] = new bidak(blackKnight, 1, 0, false);
-    bidaks[index++] = new bidak(blackKnight, 6, 0, false);
+    bidaks[index++] = new knight(blackKnight, 1, 0, false);
+    bidaks[index++] = new knight(blackKnight, 6, 0, false);
 
     // ===== BISHOP =====
-    bidaks[index++] = new bidak(whiteBishop, 2, 7, true);
-    bidaks[index++] = new bidak(whiteBishop, 5, 7, true);
-    bidaks[index++] = new bidak(blackBishop, 2, 0, false);
-    bidaks[index++] = new bidak(blackBishop, 5, 0, false);
+    bidaks[index++] = new bishop(whiteBishop, 2, 7, true);
+    bidaks[index++] = new bishop(whiteBishop, 5, 7, true);
+    bidaks[index++] = new bishop(blackBishop, 2, 0, false);
+    bidaks[index++] = new bishop(blackBishop, 5, 0, false);
 
     // ===== QUEEN (di kolom 3) =====
-    bidaks[index++] = new bidak(whiteQueen, 3, 7, true);
-    bidaks[index++] = new bidak(blackQueen, 3, 0, false);
+    bidaks[index++] = new queen(whiteQueen, 3, 7, true);
+    bidaks[index++] = new queen(blackQueen, 3, 0, false);
     // ===== KING (di kolom 4) =====
-    bidaks[index++] = new bidak(whiteKing, 4, 7, true);
-    bidaks[index++] = new bidak(blackKing, 4, 0, false);
+    bidaks[index++] = new king(whiteKing, 4, 7, true);
+    bidaks[index++] = new king(blackKing, 4, 0, false);
   }
 
   int index = 16;
@@ -87,6 +83,18 @@ public class bidakMngr {
       }
     }
     return clicked; // kembalikan bidak yang diklik, bisa null
+  }
+
+  public bidak getBidakAt(int col, int row) {
+    for (bidak b : bidaks) {
+      if (b != null && b.col == col && b.row == row)
+        return b;
+    }
+    return null;
+  }
+
+  public bidak[] getAllBidaks() {
+    return bidaks;
   }
 
   public void draw(Graphics2D g2) {

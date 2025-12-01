@@ -23,6 +23,7 @@ public class panelgame extends JPanel implements Runnable {
     Papan papan = new Papan();
     bidak selectedBidak = null;
     List<int[]> moves = new ArrayList<>();
+    boolean whiteTurn = true;
     // simpan bidak terpilih
 
     public panelgame() {
@@ -35,36 +36,31 @@ public class panelgame extends JPanel implements Runnable {
                 int col = e.getX() / Papan.KOTAK_SIZE;
                 int row = e.getY() / Papan.KOTAK_SIZE;
 
-                if (selectedBidak != null) {
-                    // cek apakah klik di kotak tujuan
-                    boolean validMove = false;
+                // klik bidak
+                bidak clicked = bidakMngr.getBidakAt(col, row);
+
+                // pilih bidak sesuai giliran
+                if (clicked != null && clicked.isWhite == whiteTurn) {
+                    selectedBidak = clicked;
+                    moves = selectedBidak.getPossibleMoves(bidakMngr.getAllBidaks());
+                }
+                // klik kotak tujuan
+                else if (selectedBidak != null) {
                     for (int[] move : moves) {
                         if (move[0] == col && move[1] == row) {
-                            validMove = true;
+                            selectedBidak.col = col;
+                            selectedBidak.row = row;
+
+                            selectedBidak = null;
+                            moves.clear();
+
+                            // ganti giliran setelah bergerak
+                            whiteTurn = !whiteTurn;
                             break;
                         }
                     }
-
-                    if (validMove) {
-                        // pindahkan bidak
-                        selectedBidak.col = col;
-                        selectedBidak.row = row;
-                        moves.clear();
-                        selectedBidak.selected = false;
-                        selectedBidak = null;
-                        repaint();
-                        return; // sudah pindah, keluar
-                    }
                 }
 
-                // jika tidak memindahkan, pilih bidak baru
-                selectedBidak = bidakMngr.selectBidakAt(col, row);
-                if (selectedBidak != null && selectedBidak instanceof pawn) {
-                    pawn p = (pawn) selectedBidak;
-                    moves = p.getPossibleMoves(bidakMngr.getAllBidaks());
-                } else {
-                    moves.clear();
-                }
                 repaint();
             }
         });
@@ -104,25 +100,18 @@ public class panelgame extends JPanel implements Runnable {
 
     }
 
-    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-
-        // gambar papan
         papan.draw(g2);
-
-        // highlight kotak gerakan (jika ada)
-        if (moves != null) {
-            g2.setColor(new Color(0, 255, 0, 100)); // hijau transparan
-            for (int[] move : moves) {
-                g2.fillRect(move[0] * Papan.KOTAK_SIZE, move[1] * Papan.KOTAK_SIZE,
-                        Papan.KOTAK_SIZE, Papan.KOTAK_SIZE);
-            }
-        }
-
-        // gambar semua bidak di atas highlight
         bidakMngr.draw(g2);
+
+        // highlight
+        g2.setColor(new Color(0, 255, 0, 100));
+        for (int[] move : moves) {
+            g2.fillRect(move[0] * Papan.KOTAK_SIZE, move[1] * Papan.KOTAK_SIZE,
+                    Papan.KOTAK_SIZE, Papan.KOTAK_SIZE);
+        }
     }
 
 }
