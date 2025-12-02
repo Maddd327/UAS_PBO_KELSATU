@@ -12,7 +12,8 @@ public class bidak {
   public int col, row; // posisi grid 0–7
   public boolean alive = true;
   public boolean selected = false;
-  public boolean isWhite; // <-- tambahkan properti ini
+  public boolean isWhite;
+  public boolean captured = false; // <-- tambahkan properti ini
 
   public bidak(BufferedImage img, int col, int row, boolean isWhite) {
     this.img = img;
