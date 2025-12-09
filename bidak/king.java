@@ -1,33 +1,31 @@
 package bidak;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.image.BufferedImage;
 
-public class king extends bidak {
+public class King extends Bidak {
+  private static final int[][] MOVES = {
+      { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 }
+  };
 
-  public king(BufferedImage img, int col, int row, boolean isWhite) {
+  public King(BufferedImage img, int col, int row, boolean isWhite) {
     super(img, col, row, isWhite);
   }
 
   @Override
-  public List<int[]> getPossibleMoves(bidak[] allBidaks) {
+  public List<int[]> getPossibleMoves(Bidak[] all) {
     List<int[]> moves = new ArrayList<>();
-    bidak[][] board = new bidak[8][8];
-    for (bidak b : allBidaks)
-      if (b != null)
-        board[b.col][b.row] = b;
+    for (int[] m : MOVES)
+      addStepMove(col + m[0], row + m[1], all, moves);
 
-    int[][] directions = { { -1, -1 }, { -1, 0 }, { -1, 1 }, { 0, -1 }, { 0, 1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
-    for (int[] d : directions) {
-      int newCol = col + d[0];
-      int newRow = row + d[1];
-      if (newCol >= 0 && newCol < 8 && newRow >= 0 && newRow < 8) {
-        if (board[newCol][newRow] == null || board[newCol][newRow].isWhite != this.isWhite) {
-          moves.add(new int[] { newCol, newRow });
-        }
-      }
-    }
+    // castling
+    // TODO: cek hasMoved rook & king, jalur kosong, raja tidak in check
     return moves;
+  }
+
+  @Override
+  public String getName() {
+    return isWhite ? "King Putih" : "King Hitam";
   }
 }

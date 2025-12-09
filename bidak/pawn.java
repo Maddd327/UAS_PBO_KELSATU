@@ -1,53 +1,49 @@
 package bidak;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.awt.image.BufferedImage;
+public class Pawn extends Bidak {
+  private int lastDoubleStepTurn = -1; // untuk en passant
 
-public class pawn extends bidak {
-
-  public pawn(BufferedImage img, int col, int row, boolean isWhite) {
+  public Pawn(BufferedImage img, int col, int row, boolean isWhite) {
     super(img, col, row, isWhite);
   }
 
-  public List<int[]> getPossibleMoves(bidak[] allBidaks) {
+  public void setLastDoubleStepTurn(int turn) {
+    lastDoubleStepTurn = turn;
+  }
+
+  public int getLastDoubleStepTurn() {
+    return lastDoubleStepTurn;
+  }
+
+  @Override
+  public List<int[]> getPossibleMoves(Bidak[] all) {
     List<int[]> moves = new ArrayList<>();
+    int dir = isWhite ? -1 : 1;
+    int startRow = isWhite ? 6 : 1;
 
-    // buat papan 8x8 untuk cek posisi bidak
-    bidak[][] board = new bidak[8][8];
-    for (bidak b : allBidaks) {
-      if (b != null)
-        board[b.col][b.row] = b;
-    }
-
-    int dir = isWhite ? -1 : 1; // putih ke atas, hitam ke bawah
-    int newRow = row + dir;
-
-    // maju 1 langkah
-    if (newRow >= 0 && newRow < 8 && board[col][newRow] == null) {
-      moves.add(new int[] { col, newRow });
-
-      // maju 2 langkah di posisi awal
-      if ((isWhite && row == 6) || (!isWhite && row == 1)) {
-        int twoRow = row + 2 * dir;
-        if (board[col][twoRow] == null) {
-          moves.add(new int[] { col, twoRow });
-        }
-      }
-    }
-
+    // maju 1
+    if (!isOccupied(col, row + dir, all))
+      moves.add(new int[] { col, row + dir });
+    // maju 2
+    if (row == startRow && !isOccupied(col, row + dir, all) && !isOccupied(col, row + 2 * dir, all))
+      moves.add(new int[] { col, row + 2 * dir });
     // serang diagonal
-    for (int dcol = -1; dcol <= 1; dcol += 2) {
-      int newCol = col + dcol;
-      if (newCol >= 0 && newCol < 8 && newRow >= 0 && newRow < 8) {
-        bidak target = board[newCol][newRow];
-        if (target != null && target.isWhite != this.isWhite) {
-          moves.add(new int[] { newCol, newRow });
-        }
-      }
-    }
+    if (isWithinBoard(col - 1, row + dir) && isEnemy(col - 1, row + dir, all))
+      moves.add(new int[] { col - 1, row + dir });
+    if (isWithinBoard(col + 1, row + dir) && isEnemy(col + 1, row + dir, all))
+      moves.add(new int[] { col + 1, row + dir });
+
+    // TODO: en passant (cek lastDoubleStepTurn)
 
     return moves;
+  }
+
+  @Override
+  public String getName() {
+    return isWhite ? "Pawn Putih" : "Pawn Hitam";
   }
 }

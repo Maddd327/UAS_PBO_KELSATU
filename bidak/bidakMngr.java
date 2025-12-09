@@ -5,133 +5,121 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class bidakMngr {
+public class BidakMngr {
 
-  // list dinamis (GANTI array 32)
-  private final List<bidak> listBidak = new ArrayList<>();
+    private final List<Bidak> bidaks = new ArrayList<>();
 
-  BufferedImage whitePawn, whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing;
-  BufferedImage blackPawn, blackRook, blackKnight, blackBishop, blackQueen, blackKing;
+    // BufferedImages untuk setiap type bidak
+    BufferedImage whitePawn, whiteRook, whiteKnight, whiteBishop, whiteQueen, whiteKing;
+    BufferedImage blackPawn, blackRook, blackKnight, blackBishop, blackQueen, blackKing;
 
-  public bidakMngr() {
-    loadImages();
-    setPieces();
-  }
+    public BidakMngr() {
+        loadImages();
+        setupPieces();
+    }
 
-  public BufferedImage getWhitePawnIcon() {
-    return whitePawn;
-  }
+    private void loadImages() {
+        whitePawn = imageLoader.load("img/bidak/W_pawn.png");
+        whiteRook = imageLoader.load("img/bidak/W_rook.png");
+        whiteKnight = imageLoader.load("img/bidak/W_knight.png");
+        whiteBishop = imageLoader.load("img/bidak/W_bishop.png");
+        whiteQueen = imageLoader.load("img/bidak/W_queen.png");
+        whiteKing = imageLoader.load("img/bidak/W_king.png");
 
-  public BufferedImage getBlackPawnIcon() {
-    return blackPawn;
-  }
+        blackPawn = imageLoader.load("img/bidak/B_pawn.png");
+        blackRook = imageLoader.load("img/bidak/B_rook.png");
+        blackKnight = imageLoader.load("img/bidak/B_knight.png");
+        blackBishop = imageLoader.load("img/bidak/B_bishop.png");
+        blackQueen = imageLoader.load("img/bidak/B_queen.png");
+        blackKing = imageLoader.load("img/bidak/B_king.png");
+    }
 
-  // ===========================================================
-  // LOAD ASSET
-  // ===========================================================
-  private void loadImages() {
-    whitePawn = imageLoader.load("img/bidak/W_pawn.png");
-    whiteRook = imageLoader.load("img/bidak/W_rook.png");
-    whiteKnight = imageLoader.load("img/bidak/W_knight.png");
-    whiteBishop = imageLoader.load("img/bidak/W_bishop.png");
-    whiteQueen = imageLoader.load("img/bidak/W_queen.png");
-    whiteKing = imageLoader.load("img/bidak/W_king.png");
-
-    blackPawn = imageLoader.load("img/bidak/B_pawn.png");
-    blackRook = imageLoader.load("img/bidak/B_rook.png");
-    blackKnight = imageLoader.load("img/bidak/B_knight.png");
-    blackBishop = imageLoader.load("img/bidak/B_bishop.png");
-    blackQueen = imageLoader.load("img/bidak/B_queen.png");
-    blackKing = imageLoader.load("img/bidak/B_king.png");
-  }
-
-  // ===========================================================
-  // BUAT BIDAK
-  // ===========================================================
-  private void setPieces() {
-
-    // === PAWN ===
-    for (int i = 0; i < 8; i++)
-      listBidak.add(new pawn(whitePawn, i, 6, true));
-
-    for (int i = 0; i < 8; i++)
-      listBidak.add(new pawn(blackPawn, i, 1, false));
-
-    // === ROOK ===
-    listBidak.add(new rook(whiteRook, 0, 7, true));
-    listBidak.add(new rook(whiteRook, 7, 7, true));
-
-    listBidak.add(new rook(blackRook, 0, 0, false));
-    listBidak.add(new rook(blackRook, 7, 0, false));
-
-    // === KNIGHT ===
-    listBidak.add(new knight(whiteKnight, 1, 7, true));
-    listBidak.add(new knight(whiteKnight, 6, 7, true));
-
-    listBidak.add(new knight(blackKnight, 1, 0, false));
-    listBidak.add(new knight(blackKnight, 6, 0, false));
-
-    // === BISHOP ===
-    listBidak.add(new bishop(whiteBishop, 2, 7, true));
-    listBidak.add(new bishop(whiteBishop, 5, 7, true));
-
-    listBidak.add(new bishop(blackBishop, 2, 0, false));
-    listBidak.add(new bishop(blackBishop, 5, 0, false));
-
-    // === QUEEN ===
-    listBidak.add(new queen(whiteQueen, 3, 7, true));
-    listBidak.add(new queen(blackQueen, 3, 0, false));
-
-    // === KING ===
-    listBidak.add(new king(whiteKing, 4, 7, true));
-    listBidak.add(new king(blackKing, 4, 0, false));
-  }
-
-  // ===========================================================
-  // SELEKSI & AMBIL BIDAK
-  // ===========================================================
-  public bidak selectBidakAt(int col, int row) {
-    bidak clicked = null;
-
-    for (bidak b : listBidak) {
-      if (b.alive && !b.captured) {
-        b.selected = false;
-        if (b.col == col && b.row == row) {
-          b.selected = true;
-          clicked = b;
+    private void setupPieces() {
+        // Pawns
+        for (int i = 0; i < 8; i++) {
+            bidaks.add(new Pawn(whitePawn, i, 6, true));
+            bidaks.add(new Pawn(blackPawn, i, 1, false));
         }
-      }
+        // Rooks
+        bidaks.add(new Rook(whiteRook, 0, 7, true));
+        bidaks.add(new Rook(whiteRook, 7, 7, true));
+        bidaks.add(new Rook(blackRook, 0, 0, false));
+        bidaks.add(new Rook(blackRook, 7, 0, false));
+
+        // Knights
+        bidaks.add(new Knight(whiteKnight, 1, 7, true));
+        bidaks.add(new Knight(whiteKnight, 6, 7, true));
+        bidaks.add(new Knight(blackKnight, 1, 0, false));
+        bidaks.add(new Knight(blackKnight, 6, 0, false));
+
+        // Bishops
+        bidaks.add(new Bishop(whiteBishop, 2, 7, true));
+        bidaks.add(new Bishop(whiteBishop, 5, 7, true));
+        bidaks.add(new Bishop(blackBishop, 2, 0, false));
+        bidaks.add(new Bishop(blackBishop, 5, 0, false));
+
+        // Queens
+        bidaks.add(new Queen(whiteQueen, 3, 7, true));
+        bidaks.add(new Queen(blackQueen, 3, 0, false));
+
+        // Kings
+        bidaks.add(new King(whiteKing, 4, 7, true));
+        bidaks.add(new King(blackKing, 4, 0, false));
     }
 
-    return clicked;
-  }
-
-  public bidak getBidakAt(int col, int row) {
-    for (bidak b : listBidak) {
-      if (b.alive && !b.captured && b.col == col && b.row == row)
-        return b;
+    // ===================================
+    // FUNGSI TAMBAHAN: DIPERLUKAN OLEH GameLogic.handlePromotion()
+    // ===================================
+    public void addBidak(Bidak b) {
+        bidaks.add(b);
     }
-    return null;
-  }
 
-  public bidak[] getAllBidaks() {
-    return listBidak.toArray(new bidak[0]);
-  }
-
-  // ===========================================================
-  // HAPUS BIDAK YANG SUDAH DI-MAKAN
-  // ===========================================================
-  public void cleanup() {
-    listBidak.removeIf(b -> b.captured);
-  }
-
-  // ===========================================================
-  // RENDER
-  // ===========================================================
-  public void draw(Graphics2D g2) {
-    for (bidak b : listBidak) {
-      if (b.alive && !b.captured)
-        b.draw(g2);
+    public void removeBidak(Bidak b) {
+        bidaks.remove(b);
     }
-  }
+
+    // ===================================
+    // UTILITY
+    // ===================================
+    public Bidak getBidakAt(int col, int row) {
+        for (Bidak b : bidaks) {
+            if (!b.isCaptured() && b.getCol() == col && b.getRow() == row)
+                return b;
+        }
+        return null;
+    }
+
+    public Bidak[] getAllBidaks() {
+        return bidaks.toArray(new Bidak[0]);
+    }
+
+    public void cleanup() {
+        bidaks.removeIf(Bidak::isCaptured);
+    }
+
+    // ===================================
+    // PROMOTION LAMA (TIDAK DIGUNAKAN)
+    // ===================================
+    @Deprecated
+    public void promotePawn(Pawn pawn) {
+        // DISABLED: Logika promosi sekarang ada di GameLogic.handlePromotion()
+        System.out.println("promotePawn() tidak digunakan lagi. Promosi ditangani oleh GameLogic.");
+    }
+
+    // ===================================
+    // DRAWING
+    // ===================================
+    public BufferedImage getWhiteTurnIcon() {
+        return whitePawn;
+    }
+
+    public BufferedImage getBlackTurnIcon() {
+        return blackPawn;
+    }
+
+    public void draw(Graphics2D g2) {
+        for (Bidak b : bidaks) {
+            b.draw(g2);
+        }
+    }
 }

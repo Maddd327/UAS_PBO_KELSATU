@@ -1,20 +1,24 @@
 package bidak;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
-public class queen extends bidak {
+public class Queen extends Bidak {
+    private static final int[][] DIRS = {
+        {1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}
+    };
 
-  public queen(BufferedImage img, int col, int row, boolean isWhite) {
-    super(img, col, row, isWhite);
-  }
+    public Queen(BufferedImage img, int col, int row, boolean isWhite) {
+        super(img, col, row, isWhite);
+    }
 
-  @Override
-  public List<int[]> getPossibleMoves(bidak[] allBidaks) {
-    List<int[]> moves = new ArrayList<>();
-    moves.addAll(new rook(this.img, this.col, this.row, this.isWhite).getPossibleMoves(allBidaks));
-    moves.addAll(new bishop(this.img, this.col, this.row, this.isWhite).getPossibleMoves(allBidaks));
-    return moves;
-  }
+    @Override
+    public List<int[]> getPossibleMoves(Bidak[] allBidaks) {
+        return slideMoves(DIRS, allBidaks);
+    }
+
+    @Override
+    public String getName() {
+        return isWhite ? "Queen Putih" : "Queen Hitam";
+    }
 }
