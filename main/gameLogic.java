@@ -1,7 +1,10 @@
 package main;
 
-import bidak.*;
-import javax.swing.JOptionPane;
+import bidak.Bidak;
+import bidak.BidakMngr;
+import bidak.King;
+import bidak.Pawn;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,96 +14,149 @@ public class GameLogic {
     private boolean whiteTurn = true;
     private final List<Bidak> graveyardWhite = new ArrayList<>();
     private final List<Bidak> graveyardBlack = new ArrayList<>();
+    private int turnCount = 1; // untuk en passant
 
-    public GameLogic(BidakMngr manager) {
+    public GameLogic(final BidakMngr manager) {
         this.manager = manager;
     }
 
-    // ========================
-    // TURN MANAGEMENT
-    // ========================
     public boolean isWhiteTurn() {
         return whiteTurn;
     }
 
     private void endTurn() {
         whiteTurn = !whiteTurn;
+        turnCount++;
     }
 
-    private boolean isTurnValid(Bidak b) {
+    public int getTurnCount() {
+        return turnCount;
+    }
+
+    private boolean isTurnValid(final Bidak b) {
         return b != null && b.isWhite() == whiteTurn;
     }
 
-    // ========================
-    // MOVE CALCULATION
-    // ========================
-    public List<int[]> getPossibleMoves(Bidak b) {
+    public List<int[]> getPossibleMoves(final Bidak b) {
         if (b == null)
             return new ArrayList<>();
         return b.getPossibleMoves(manager.getAllBidaks());
     }
 
-    private boolean isMoveValid(Bidak b, int col, int row) {
+    private boolean isMoveValid(final Bidak b, final int col, final int row) {
         return getPossibleMoves(b).stream()
                 .anyMatch(m -> m[0] == col && m[1] == row);
     }
 
-    // ========================
-    // MAIN MOVE LOGIC
-    // ========================
-    public boolean tryMove(Bidak b, int targetCol, int targetRow) {
+    // ==========================
+    // FIND KING
+    // ==========================
+    public King findKing(boolean isWhite) {
+        for (Bidak b : manager.getAllBidaks()) {
+            if (!b.isCaptured() && b instanceof King && b.isWhite() == isWhite) {
+                return (King) b;
+            }
+        }
+        return null;
+    }
+
+    // ==========================
+    // TRY MOVE + EN PASSANT SUPPORT
+    // ==========================
+    public boolean tryMove(final Bidak b, final int targetCol, final int targetRow) {
         if (!isTurnValid(b) || !isMoveValid(b, targetCol, targetRow))
             return false;
 
-        Bidak target = manager.getBidakAt(targetCol, targetRow);
-        int oldCol = b.getCol();
-        int oldRow = b.getRow();
+        final Bidak target = manager.getBidakAt(targetCol, targetRow);
+        final int oldCol = b.getCol();
+        final int oldRow = b.getRow();
         boolean targetWasCaptured = false;
+        Bidak enPassantTarget = null;
 
+        // ======================
+        // CEK EN PASSANT
+        // ======================
+        if (b instanceof Pawn && target == null) {
+            Pawn pawn = (Pawn) b;
+            for (Bidak other : manager.getAllBidaks()) {
+                if (other instanceof Pawn && other.isWhite() != b.isWhite()) {
+                    Pawn enemyPawn = (Pawn) other;
+                    if (enemyPawn.getRow() == b.getRow() &&
+                            Math.abs(enemyPawn.getCol() - b.getCol()) == 1 &&
+                            enemyPawn.getLastDoubleStepTurn() == turnCount - 1 &&
+                            targetCol == enemyPawn.getCol() &&
+                            targetRow == b.getRow() + (b.isWhite() ? -1 : 1)) {
+
+                        enPassantTarget = enemyPawn;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // ======================
+        // SIMULASI UNTUK CEK SKAK
+        // ======================
         if (target != null) {
             targetWasCaptured = target.isCaptured();
+            target.setCaptured(true);
+        }
+        if (enPassantTarget != null)
+            enPassantTarget.setCaptured(true);
+
+        b.setPosition(targetCol, targetRow);
+
+        boolean stillInCheck = isInCheck(b.isWhite());
+
+        // rollback
+        b.setPosition(oldCol, oldRow);
+        if (target != null)
+            target.setCaptured(targetWasCaptured);
+        if (enPassantTarget != null)
+            enPassantTarget.setCaptured(false);
+
+        // jika masih skak, shake raja
+        if (stillInCheck) {
+            King king = findKing(b.isWhite());
+            if (king != null)
+                king.shakeRed();
+            return false;
+        }
+
+        // ======================
+        // JALANKAN GERAKAN SEBENARNYA
+        // ======================
+        if (target != null)
             capture(target);
+        if (enPassantTarget != null)
+            capture(enPassantTarget);
+
+        // set posisi pawn setelah double step
+        if (b instanceof Pawn) {
+            Pawn pawn = (Pawn) b;
+            if (Math.abs(targetRow - oldRow) == 2)
+                pawn.setLastDoubleStepTurn(turnCount);
         }
 
         b.setPosition(targetCol, targetRow);
 
-        // ========================
-        // PAWN PROMOTION (CUSTOM: WAJIB ADA BIDAK BESAR DI KUBURAN)
-        // ========================
+        // pawn promotion
         if (b instanceof Pawn) {
-            int lastRow = b.isWhite() ? 0 : 7;
+            final int lastRow = b.isWhite() ? 0 : 7;
             if (b.getRow() == lastRow) {
-                handlePromotion((Pawn) b);
+                // overlay handled elsewhere
             }
         }
 
-        // cek apakah setelah langkah ini, raja sendiri masih dalam skak
-        if (isInCheck(b.isWhite())) {
-            // rollback karena raja masih check
-            b.setPosition(oldCol, oldRow);
-            if (target != null)
-                target.setCaptured(targetWasCaptured);
-
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                javax.swing.JOptionPane.showMessageDialog(null,
-                        "Gerakan tidak sah! Raja Anda masih dalam skak.",
-                        "Illegal Move",
-                        javax.swing.JOptionPane.WARNING_MESSAGE);
-            });
-
-            return false;
-        }
-
-        boolean moverIsWhite = b.isWhite(); // simpan sebelum endTurn()
-        // move sah → lanjutkan turn
         endTurn();
         manager.cleanup();
 
-        // cek check / checkmate lawan
-        boolean opponentWhite = isWhiteTurn();
+        // cek skak / checkmate lawan
+        final boolean moverIsWhite = !whiteTurn;
+        final boolean opponentWhite = isWhiteTurn();
         if (isInCheck(opponentWhite)) {
             if (isCheckmate(opponentWhite)) {
-                String winner = moverIsWhite ? "Putih" : "Hitam";
+                final String winner = moverIsWhite ? "Putih" : "Hitam";
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     javax.swing.JOptionPane.showMessageDialog(null,
                             "Checkmate! Pemenang: " + winner,
@@ -120,121 +176,28 @@ public class GameLogic {
         return true;
     }
 
-    // ========================
-    // PROMOTION DENGAN ATURAN KUBURAN
-    // ========================
-    private void handlePromotion(Pawn pawn) {
-        // pilih graveyard sesuai warna
-        List<Bidak> graveyard = pawn.isWhite() ? graveyardWhite : graveyardBlack;
-
-        boolean canQueen = false;
-        boolean canRook = false;
-        boolean canBishop = false;
-        boolean canKnight = false;
-
-        // cek jenis bidak besar apa saja yang ada di kuburan
-        for (Bidak piece : graveyard) {
-            if (piece instanceof Queen)  canQueen  = true;
-            if (piece instanceof Rook)   canRook   = true;
-            if (piece instanceof Bishop) canBishop = true;
-            if (piece instanceof Knight) canKnight = true;
-        }
-
-        // kalau tidak ada satupun bidak besar yang mati -> promosi dilarang
-        if (!canQueen && !canRook && !canBishop && !canKnight) {
-            JOptionPane.showMessageDialog(
-                null,
-                "Tidak bisa promosi.\n" +
-                "Tidak ada bidak Ratu / Benteng / Gajah / Kuda yang sudah dimakan.",
-                "Promosi Ditolak",
-                JOptionPane.WARNING_MESSAGE
-            );
-            return; // pawn tetap pawn di petak terakhir
-        }
-
-        // buat list pilihan sesuai bidak yang benar-benar ada di kuburan
-        List<String> optionsList = new ArrayList<>();
-        if (canQueen)  optionsList.add("Queen");
-        if (canRook)   optionsList.add("Rook");
-        if (canBishop) optionsList.add("Bishop");
-        if (canKnight) optionsList.add("Knight");
-
-        String[] options = optionsList.toArray(new String[0]);
-
-        int choice = JOptionPane.showOptionDialog(
-                null,
-                "Pilih bidak promosi (hanya yang sudah ada di kuburan):",
-                "Pawn Promotion",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[0]
-        );
-
-        if (choice < 0) {
-            // pemain close dialog / cancel -> batal promosi
-            return;
-        }
-
-        String selected = options[choice];
-
-        // ambil satu bidak yang sesuai dengan pilihan dari kuburan
-        Bidak usedPiece = null;
-        for (Bidak piece : graveyard) {
-            if (selected.equals("Queen")  && piece instanceof Queen)  { usedPiece = piece; break; }
-            if (selected.equals("Rook")   && piece instanceof Rook)   { usedPiece = piece; break; }
-            if (selected.equals("Bishop") && piece instanceof Bishop) { usedPiece = piece; break; }
-            if (selected.equals("Knight") && piece instanceof Knight) { usedPiece = piece; break; }
-        }
-
-        if (usedPiece == null) {
-            // fallback (harusnya tidak terjadi)
-            return;
-        }
-
-        // 1) keluarkan bidak besar dari kuburan → tidak ditampilkan lagi di sidebar
-        graveyard.remove(usedPiece);
-
-        // 2) hidupkan kembali bidak besar ini di posisi pawn
-        usedPiece.setCaptured(false);
-        usedPiece.setPosition(pawn.getCol(), pawn.getRow());
-
-        // 3) pawn-nya sendiri masuk kuburan
-        capture(pawn);  // akan menambah pawn ke graveyardWhite/Black
-
-        // 4) masukkan bidak besar yang dihidupkan ke daftar bidak di papan
-        manager.addBidak(usedPiece);
-    }
-
-    // ========================
+    // ==========================
     // CAPTURE
-    // ========================
-    private void capture(Bidak target) {
-        target.capture();
+    // ==========================
+    private void capture(final Bidak target) {
+        target.setCaptured(true);
         if (target.isWhite())
             graveyardWhite.add(target);
         else
             graveyardBlack.add(target);
     }
 
-    // ========================
+    // ==========================
     // CHECK & CHECKMATE
-    // ========================
-    public boolean isInCheck(boolean whiteKing) {
-        Bidak king = null;
-        for (Bidak b : manager.getAllBidaks()) {
-            if (!b.isCaptured() && b instanceof King && b.isWhite() == whiteKing) {
-                king = b;
-                break;
-            }
-        }
+    // ==========================
+    public boolean isInCheck(final boolean whiteKing) {
+        Bidak king = findKing(whiteKing);
         if (king == null)
             return false;
 
-        for (Bidak b : manager.getAllBidaks()) {
+        for (final Bidak b : manager.getAllBidaks()) {
             if (!b.isCaptured() && b.isWhite() != whiteKing) {
-                for (int[] m : b.getPossibleMoves(manager.getAllBidaks())) {
+                for (final int[] m : b.getPossibleMoves(manager.getAllBidaks())) {
                     if (m[0] == king.getCol() && m[1] == king.getRow())
                         return true;
                 }
@@ -243,26 +206,27 @@ public class GameLogic {
         return false;
     }
 
-    public boolean isCheckmate(boolean whiteKing) {
+    public boolean isCheckmate(final boolean whiteKing) {
         if (!isInCheck(whiteKing))
             return false;
 
-        for (Bidak b : manager.getAllBidaks()) {
+        for (final Bidak b : manager.getAllBidaks()) {
             if (b.isCaptured() || b.isWhite() != whiteKing)
                 continue;
 
-            for (int[] m : b.getPossibleMoves(manager.getAllBidaks())) {
-                int oldCol = b.getCol(), oldRow = b.getRow();
-                Bidak target = manager.getBidakAt(m[0], m[1]);
+            for (final int[] m : b.getPossibleMoves(manager.getAllBidaks())) {
+                final int oldCol = b.getCol();
+                final int oldRow = b.getRow();
+                final Bidak target = manager.getBidakAt(m[0], m[1]);
                 boolean targetWasCaptured = false;
 
                 if (target != null) {
                     targetWasCaptured = target.isCaptured();
-                    target.capture();
+                    target.setCaptured(true);
                 }
 
                 b.setPosition(m[0], m[1]);
-                boolean stillInCheck = isInCheck(whiteKing);
+                final boolean stillInCheck = isInCheck(whiteKing);
 
                 // rollback
                 b.setPosition(oldCol, oldRow);
@@ -277,14 +241,49 @@ public class GameLogic {
         return true;
     }
 
-    // ========================
+    // ==========================
     // GRAVEYARD
-    // ========================
+    // ==========================
     public List<Bidak> getGraveyardWhite() {
         return graveyardWhite;
     }
 
     public List<Bidak> getGraveyardBlack() {
         return graveyardBlack;
+    }
+
+    public List<Bidak> getWhiteGraveyard() {
+        return getGraveyardWhite();
+    }
+
+    public List<Bidak> getBlackGraveyard() {
+        return getGraveyardBlack();
+    }
+
+    public boolean hasPromotionPiece(final List<Bidak> graveyard) {
+        if (graveyard == null)
+            return false;
+        for (final Bidak b : graveyard) {
+            if (b instanceof bidak.Queen || b instanceof bidak.Rook || b instanceof bidak.Bishop
+                    || b instanceof bidak.Knight)
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isPromotionRank(final Pawn pawn) {
+        if (pawn == null)
+            return false;
+        return pawn.isWhite() ? pawn.getRow() == 0 : pawn.getRow() == 7;
+    }
+
+    public void reviveFromGrave(final Bidak piece) {
+        if (piece == null)
+            return;
+        if (piece.isWhite())
+            graveyardWhite.remove(piece);
+        else
+            graveyardBlack.remove(piece);
+        piece.setCaptured(false);
     }
 }

@@ -25,4 +25,5 @@ public class Knight extends Bidak {
   public String getName() {
     return isWhite ? "Knight Putih" : "Knight Hitam";
   }
+
 }

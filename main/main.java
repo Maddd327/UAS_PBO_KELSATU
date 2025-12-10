@@ -10,7 +10,7 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Set icon aplikasi
-        ImageIcon icon = new ImageIcon("img/chess.png");
+        ImageIcon icon = new ImageIcon("asset/chess.png");
         window.setIconImage(icon.getImage());
 
         // Buat panel game dan tambahkan ke window

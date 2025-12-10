@@ -4,20 +4,21 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.JPanel;
+
 import bidak.Bidak;
 import bidak.BidakMngr;
+import bidak.Pawn;
 
 public class InputHandler extends MouseAdapter {
 
   private final BidakMngr manager;
   private final GameLogic logic;
-  private final JPanel panel;
+  private final PanelGame panel;
 
   private Bidak selected;
   private List<int[]> possibleMoves;
 
-  public InputHandler(BidakMngr manager, GameLogic logic, JPanel panel) {
+  public InputHandler(BidakMngr manager, GameLogic logic, PanelGame panel) {
     this.manager = manager;
     this.logic = logic;
     this.panel = panel;
@@ -41,19 +42,35 @@ public class InputHandler extends MouseAdapter {
     } else {
       // sudah ada bidak terpilih
       if (clicked == selected) {
-        // klik bidak yang sama → batal pilih
         selected.setSelected(false);
         selected = null;
         possibleMoves = null;
       } else if (clicked != null && clicked.isWhite() == logic.isWhiteTurn()) {
-        // klik bidak lain yang sama warna → ganti selection
         selected.setSelected(false);
         selected = clicked;
         selected.setSelected(true);
         possibleMoves = logic.getPossibleMoves(selected);
       } else {
-        // klik papan kosong atau bidak lawan → coba gerak
+
         boolean moved = logic.tryMove(selected, col, row);
+
+        // PROMOTION CHECK
+        if (moved && selected instanceof Pawn) {
+          Pawn pawn = (Pawn) selected;
+
+          if (logic.isPromotionRank(pawn)) {
+
+            java.util.List<bidak.Bidak> graveyard = pawn.isWhite()
+                ? logic.getGraveyardWhite()
+                : logic.getGraveyardBlack();
+
+            if (logic.hasPromotionPiece(graveyard)) {
+              // start overlay in PanelGame; PanelGame will call back to revive/promote
+              panel.startPromotion(pawn, graveyard);
+            }
+          }
+        }
+
         selected.setSelected(false);
         selected = null;
         possibleMoves = null;
@@ -61,7 +78,6 @@ public class InputHandler extends MouseAdapter {
     }
 
     panel.repaint();
-
   }
 
   public void drawMoveHints(Graphics2D g) {
