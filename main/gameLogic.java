@@ -4,7 +4,6 @@ import bidak.Bidak;
 import bidak.BidakMngr;
 import bidak.King;
 import bidak.Pawn;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,8 @@ public class GameLogic  {
     // ========================
     // TURN MANAGEMENT
     // ========================
+ 
+
     public boolean isWhiteTurn() {
         return whiteTurn;
     }
@@ -170,6 +171,9 @@ public class GameLogic  {
         }
         return false;
     }
+    public void setInitialTurn(boolean whiteStarts) {
+    this.whiteTurn = whiteStarts;
+}
 
     public boolean isCheckmate(final boolean whiteKing) {
         if (!isInCheck(whiteKing))

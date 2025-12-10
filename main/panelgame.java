@@ -1,9 +1,5 @@
 package main;
 
-import java.awt.*;
-import java.util.ArrayList;
-
-import javax.swing.JPanel;
 import bidak.Bidak;
 import bidak.BidakMngr;
 import bidak.Bishop;
@@ -11,6 +7,9 @@ import bidak.Knight;
 import bidak.Pawn;
 import bidak.Queen;
 import bidak.Rook;
+import java.awt.*;
+import java.util.ArrayList;
+import javax.swing.JPanel;
 
 public class PanelGame extends JPanel implements Runnable {
 
@@ -26,6 +25,10 @@ public class PanelGame extends JPanel implements Runnable {
     private final InputHandler input;
     private final SidebarRenderer sidebar;
     private final PromotionOverlay promotionOverlay;
+    private boolean playerIsWhite = true;   // default
+    
+
+
 
     public PanelGame() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -46,6 +49,9 @@ public class PanelGame extends JPanel implements Runnable {
     public void launchGame() {
         gameThread = new Thread(this);
         gameThread.start();
+    }
+    public void setPlayerColor(boolean isWhite) {
+    this.playerIsWhite = isWhite;
     }
 
     @Override
@@ -83,9 +89,27 @@ public class PanelGame extends JPanel implements Runnable {
         });
     }
 
-    private void update() {
-        // tempat animasi / update logika jika perlu
+   private void update() {
+
+    // Ambil giliran dari GameLogic
+    boolean whiteTurn = logic.isWhiteTurn();
+
+    // Jika player putih tapi bukan giliran putih → blok input
+    if (playerIsWhite && !whiteTurn) {
+        input.blockInput(); 
+        return;
     }
+
+    // Jika player hitam tapi masih giliran putih → blok input
+    if (!playerIsWhite && whiteTurn) {
+        input.blockInput();
+        return;
+    }
+
+    // kalau gilirannya, izinkan input
+    input.allowInput();
+}
+
 
     @Override
     public void paintComponent(final Graphics g) {

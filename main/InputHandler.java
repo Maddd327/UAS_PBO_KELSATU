@@ -1,13 +1,12 @@
 package main;
 
+import bidak.Bidak;
+import bidak.BidakMngr;
+import bidak.Pawn;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-
-import bidak.Bidak;
-import bidak.BidakMngr;
-import bidak.Pawn;
 
 public class InputHandler extends MouseAdapter {
 
@@ -17,6 +16,16 @@ public class InputHandler extends MouseAdapter {
 
   private Bidak selected;
   private List<int[]> possibleMoves;
+  private boolean inputBlocked = false;
+
+public void blockInput() {
+    inputBlocked = true;
+}
+
+public void allowInput() {
+    inputBlocked = false;
+}
+
 
   public InputHandler(BidakMngr manager, GameLogic logic, PanelGame panel) {
     this.manager = manager;
