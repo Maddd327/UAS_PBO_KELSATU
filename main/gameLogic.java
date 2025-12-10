@@ -14,6 +14,7 @@ public class GameLogic {
     private boolean whiteTurn = true;
     private final List<Bidak> graveyardWhite = new ArrayList<>();
     private final List<Bidak> graveyardBlack = new ArrayList<>();
+
     private int turnCount = 1; // untuk en passant
 
     public GameLogic(final BidakMngr manager) {
