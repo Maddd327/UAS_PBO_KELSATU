@@ -3,13 +3,12 @@ package main;
 import bidak.Bidak;
 import bidak.BidakMngr;
 import bidak.Pawn;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.swing.*;
 
 public class PromotionOverlay extends JPanel {
 
@@ -39,6 +38,7 @@ public class PromotionOverlay extends JPanel {
 
     initMouse();
     initAnimTimer();
+    setVisible(false);
   }
 
   private void initAnimTimer() {

@@ -10,20 +10,29 @@ public class Papan {
     public static final int HALF_KOTAK_SIZE = KOTAK_SIZE / 2;
 
     public void draw(Graphics2D g2) {
+        draw(g2, true);
+    }
+
+    public void draw(Graphics2D g2, boolean playerIsWhite) {
 
         int width = MAX_COL * KOTAK_SIZE;
         int height = MAX_ROW * KOTAK_SIZE;
 
         // --- Gambar papan ---
         int c = 0;
-        for (int row = 0; row < MAX_ROW; row++) {
-            for (int col = 0; col < MAX_COL; col++) {
-                g2.setColor(c == 0 ? new Color(210, 165, 125) : new Color(175, 115, 70));
-                g2.fillRect(col * KOTAK_SIZE, row * KOTAK_SIZE, KOTAK_SIZE, KOTAK_SIZE);
-                c = 1 - c;
-            }
-            c = 1 - c;
-        }
+        for (int displayRow = 0; displayRow < MAX_ROW; displayRow++) {
+    for (int displayCol = 0; displayCol < MAX_COL; displayCol++) {
+
+        // Mapping koordinat papan -> tampilan (flip jika pemain memilih hitam)
+        int boardCol = playerIsWhite ? displayCol : (MAX_COL - 1 - displayCol);
+        int boardRow = playerIsWhite ? displayRow : (MAX_ROW - 1 - displayRow);
+
+        // Warna papan harus konsisten berdasarkan koordinat papan (bukan tampilan)
+        boolean light = ((boardCol + boardRow) % 2 == 0);
+        g2.setColor(light ? new Color(210, 165, 125) : new Color(175, 115, 70));
+        g2.fillRect(displayCol * KOTAK_SIZE, displayRow * KOTAK_SIZE, KOTAK_SIZE, KOTAK_SIZE);
+    }
+}
 
         // --- Outline tipis ---
         g2.setColor(new Color(80, 50, 30)); // coklat tua elegan

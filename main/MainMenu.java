@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+
 public class MainMenu extends JFrame {
     private JButton startGameButton;
     private JButton multiplayerButton;
@@ -161,14 +162,17 @@ public class MainMenu extends JFrame {
     }
 
     private void startGame(boolean isWhite) {
-        PanelGame panelGame = new PanelGame();
-        panelGame.setPlayerColor(isWhite);
-        JFrame frame = new JFrame("Chess Game");
-        frame.setContentPane(panelGame);
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
+    PanelGame panelGame = new PanelGame(isWhite);  // langsung gunakan warna pemain!
+    
+    JFrame frame = new JFrame("Chess Game");
+    frame.setContentPane(panelGame);
+    frame.pack();
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setVisible(true);
+
+    panelGame.launchGame();   // pastikan game loop berjalan
+}
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainMenu::new);
