@@ -58,12 +58,20 @@ public class PanelGame extends JPanel implements Runnable {
         // Komponen pendukung
         sidebar = new SidebarRenderer(logic, bidakMngr);
         promotionOverlay = new PromotionOverlay(bidakMngr);
-
+        setLayout(null); // penting jika overlay pakai absolute positioning
+        add(promotionOverlay);
         // Input
         input = new InputHandler(bidakMngr, logic, this);
         addMouseListener(input);
 
         setupUndoRedoKeybinds();
+
+        promotionOverlay.setBounds(
+                0, 0,
+                Papan.MAX_COL * Papan.KOTAK_SIZE,
+                Papan.MAX_ROW * Papan.KOTAK_SIZE);
+
+        promotionOverlay.setVisible(false);
     }
 
     private void setupUndoRedoKeybinds() {
@@ -147,7 +155,7 @@ public class PanelGame extends JPanel implements Runnable {
     }
 
     // =============================
-    //      UPDATE GAME
+    // UPDATE GAME
     // =============================
     private void update() {
         // Jika overlay promosi tampil, blok input sampai pemain memilih bidak promosi
@@ -159,12 +167,13 @@ public class PanelGame extends JPanel implements Runnable {
 
         // Catatan:
         // Jangan blok input berdasar giliran di sini.
-        // Kalau pemain memilih "hitam" dan belum ada AI, game akan terasa "tidak jalan".
+        // Kalau pemain memilih "hitam" dan belum ada AI, game akan terasa "tidak
+        // jalan".
         // Dengan begini, pilihan warna hanya mengubah orientasi papan + input mapping.
     }
 
     // =============================
-    //   PROMOSI BIDAK
+    // PROMOSI BIDAK
     // =============================
     public void startPromotion(final Pawn pawn, final List<Bidak> graveyard) {
         List<Bidak> validPromotions = new ArrayList<>();
@@ -182,63 +191,60 @@ public class PanelGame extends JPanel implements Runnable {
     }
 
     // =============================
-    //   RENDER
+    // RENDER
     // =============================
     @Override
-protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    Graphics2D g2 = (Graphics2D) g;
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
 
-    // Papan (kotak) sesuai orientasi pemain
-    papan.draw(g2, playerIsWhite);
+        // Papan (kotak) sesuai orientasi pemain
+        papan.draw(g2, playerIsWhite);
 
-    // Hint langkah (ditampilkan sesuai orientasi)
-    input.drawMoveHints(g2);
+        // Hint langkah (ditampilkan sesuai orientasi)
+        input.drawMoveHints(g2);
 
-    // Bidak digambar tanpa rotate supaya tidak terbalik
-    drawPieces(g2);
+        // Bidak digambar tanpa rotate supaya tidak terbalik
+        drawPieces(g2);
 
-    // Sidebar (kanan)
-    sidebar.draw(g2);
+        // Sidebar (kanan)
+        sidebar.draw(g2);
 
-    // Overlay promosi (jika ada)
-    if (promotionOverlay != null && promotionOverlay.isVisible()) {
-        // overlay adalah komponen Swing; cukup repaint agar animasi/alpha jalan
-        promotionOverlay.repaint();
     }
-}
 
-private void drawPieces(Graphics2D g2) {
-    final int size = Papan.KOTAK_SIZE;
+    private void drawPieces(Graphics2D g2) {
+        final int size = Papan.KOTAK_SIZE;
 
-    for (Bidak b : bidakMngr.getAllBidaks()) {
-        int col = b.getCol();
-        int row = b.getRow();
+        for (Bidak b : bidakMngr.getAllBidaks()) {
+            int col = b.getCol();
+            int row = b.getRow();
 
-        int drawCol = playerIsWhite ? col : (Papan.MAX_COL - 1 - col);
-        int drawRow = playerIsWhite ? row : (Papan.MAX_ROW - 1 - row);
+            int drawCol = playerIsWhite ? col : (Papan.MAX_COL - 1 - col);
+            int drawRow = playerIsWhite ? row : (Papan.MAX_ROW - 1 - row);
 
-        int x = drawCol * size;
-        int y = drawRow * size;
+            int x = drawCol * size;
+            int y = drawRow * size;
 
-        g2.drawImage(b.getImage(), x, y, size, size, null);
+            g2.drawImage(b.getImage(), x, y, size, size, null);
 
-        // highlight sederhana untuk bidak yang sedang dipilih
-        if (input != null && b == input.getSelectedBidak()) {
-            g2.setColor(new java.awt.Color(255, 255, 0, 180));
-            g2.drawRect(x + 2, y + 2, size - 4, size - 4);
+            // highlight sederhana untuk bidak yang sedang dipilih
+            if (input != null && b == input.getSelectedBidak()) {
+                g2.setColor(new java.awt.Color(255, 255, 0, 180));
+                g2.drawRect(x + 2, y + 2, size - 4, size - 4);
+            }
         }
     }
-}
 
-/**
- * Konversi koordinat papan (col,row) -> koordinat tampilan (col,row) sesuai orientasi.
- */
-public int[] boardToScreen(int col, int row) {
-    if (col < 0 || col >= Papan.MAX_COL || row < 0 || row >= Papan.MAX_ROW) return null;
-    int sc = playerIsWhite ? col : (Papan.MAX_COL - 1 - col);
-    int sr = playerIsWhite ? row : (Papan.MAX_ROW - 1 - row);
-    return new int[]{sc, sr};
-}
+    /**
+     * Konversi koordinat papan (col,row) -> koordinat tampilan (col,row) sesuai
+     * orientasi.
+     */
+    public int[] boardToScreen(int col, int row) {
+        if (col < 0 || col >= Papan.MAX_COL || row < 0 || row >= Papan.MAX_ROW)
+            return null;
+        int sc = playerIsWhite ? col : (Papan.MAX_COL - 1 - col);
+        int sr = playerIsWhite ? row : (Papan.MAX_ROW - 1 - row);
+        return new int[] { sc, sr };
+    }
 
 }
