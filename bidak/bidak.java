@@ -1,10 +1,10 @@
 package bidak;
 
-import main.Papan;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import main.Papan;
 
 public abstract class Bidak {
     protected BufferedImage img;
@@ -70,6 +70,16 @@ public abstract class Bidak {
         row = r;
         hasMoved = true;
     }
+
+    /**
+     * Set posisi tanpa mengubah flag hasMoved.
+     * Dipakai untuk undo/redo dan simulasi move (mis. castling).
+     */
+    public void setPositionNoMoveFlag(int c, int r) {
+        col = c;
+        row = r;
+    }
+
 
     public void draw(Graphics2D g2) {
         if (captured)
