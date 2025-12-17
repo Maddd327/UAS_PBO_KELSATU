@@ -18,6 +18,9 @@ public class Papan {
         int width = MAX_COL * KOTAK_SIZE;
         int height = MAX_ROW * KOTAK_SIZE;
 
+        // UI ONLY CHANGE: warna papan mengikuti tema yang dipilih user dari Main Menu
+        UIConfig.BoardTheme theme = UIConfig.getTheme();
+
         // --- Gambar papan ---
         int c = 0;
         for (int displayRow = 0; displayRow < MAX_ROW; displayRow++) {
@@ -29,13 +32,13 @@ public class Papan {
 
         // Warna papan harus konsisten berdasarkan koordinat papan (bukan tampilan)
         boolean light = ((boardCol + boardRow) % 2 == 0);
-        g2.setColor(light ? new Color(210, 165, 125) : new Color(175, 115, 70));
+        g2.setColor(light ? theme.light : theme.dark);
         g2.fillRect(displayCol * KOTAK_SIZE, displayRow * KOTAK_SIZE, KOTAK_SIZE, KOTAK_SIZE);
     }
 }
 
         // --- Outline tipis ---
-        g2.setColor(new Color(80, 50, 30)); // coklat tua elegan
+        g2.setColor(theme.outline);
         g2.drawRect(0, 0, width - 1, height - 1); // outline 1px
     }
 }

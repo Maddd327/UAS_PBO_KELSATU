@@ -26,8 +26,11 @@ public class SidebarRenderer {
 
   public void draw(Graphics2D g) {
 
-    // ===== background simpel =====
-    g.setColor(new Color(73, 135, 121));
+    // UI ONLY CHANGE: warna sidebar mengikuti tema papan agar konsisten
+    UIConfig.BoardTheme theme = UIConfig.getTheme();
+
+    // ===== background =====
+    g.setColor(theme.sidebar);
     g.fillRect(startX, 0, width, height);
 
     int y = 50;
@@ -75,7 +78,7 @@ public class SidebarRenderer {
   }
 
   private int drawSeparator(Graphics2D g, int y) {
-    g.setColor(new Color(180, 180, 180));
+    g.setColor(new Color(255, 255, 255, 80));
     g.drawLine(startX + 20, y, startX + width - 20, y);
     return y + 25;
   }

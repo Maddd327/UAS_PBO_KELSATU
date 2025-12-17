@@ -132,15 +132,18 @@ public class InputHandler extends MouseAdapter {
     if (possibleMoves == null)
       return;
 
-    g.setColor(new Color(0, 255, 0, 120));
+    // UI ONLY CHANGE: warna hint mengikuti tema + tampil lebih halus
+    java.awt.Color accent = UIConfig.getTheme().accent;
+    g.setColor(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 120));
     for (int[] m : possibleMoves) {
       int[] scr = panel.boardToScreen(m[0], m[1]);
       if (scr == null) continue;
-      g.fillOval(
-          scr[0] * Papan.KOTAK_SIZE + Papan.KOTAK_SIZE / 3,
-          scr[1] * Papan.KOTAK_SIZE + Papan.KOTAK_SIZE / 3,
-          Papan.KOTAK_SIZE / 3,
-          Papan.KOTAK_SIZE / 3);
+
+      int x = scr[0] * Papan.KOTAK_SIZE;
+      int y = scr[1] * Papan.KOTAK_SIZE;
+      int pad = Papan.KOTAK_SIZE / 10;
+      int sz = Papan.KOTAK_SIZE - pad * 2;
+      g.fillRoundRect(x + pad, y + pad, sz, sz, 18, 18);
     }
   }
 }

@@ -106,8 +106,12 @@ public class PromotionOverlay extends JPanel {
 
     // compute starting positions (centered)
     int totalW = graveyard.size() * cardW + Math.max(0, graveyard.size() - 1) * gap;
-    startX = (getWidth() - totalW) / 2;
-    startY = (getHeight() - cardH) / 2 - 20;
+
+    // UI ONLY CHANGE: kalau overlay belum dapat ukuran layout (0x0), pakai ukuran PanelGame.
+    int w = getWidth() > 0 ? getWidth() : PanelGame.WIDTH;
+    int h = getHeight() > 0 ? getHeight() : PanelGame.HEIGHT;
+    startX = (w - totalW) / 2;
+    startY = (h - cardH) / 2 - 20;
 
     animTimer.restart();
     repaint();
@@ -161,10 +165,10 @@ public class PromotionOverlay extends JPanel {
     Color fgColor;
 
     if (pawn.isWhite()) {
-      bgColor = Color.BLACK; // untuk pawn putih → background hitam
+      bgColor = Color.BLACK; // UI ONLY CHANGE: untuk pawn putih -> background hitam
       fgColor = Color.WHITE; // tulisan & label putih
     } else {
-      bgColor = Color.WHITE; // untuk pawn hitam → background putih
+      bgColor = Color.WHITE; // UI ONLY CHANGE: untuk pawn hitam -> background putih
       fgColor = Color.BLACK; // tulisan & label hitam
     }
 

@@ -77,7 +77,9 @@ public class BidakMngr {
   }
 
   public void cleanup() {
-    bidaks.removeIf(Bidak::isCaptured);
+    // UI ONLY CHANGE: Jangan hapus bidak yang captured dari list.
+    // Alasannya: fitur Undo/Redo butuh referensi bidak yang pernah dimakan untuk bisa di-revive.
+    // Rendering & interaksi tetap aman karena getBidakAt() sudah memfilter !isCaptured.
   }
 
   // --------------------------
