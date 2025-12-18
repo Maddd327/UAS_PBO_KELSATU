@@ -121,6 +121,7 @@ public class MenuPanel extends JPanel {
         stack.add(Box.createVerticalStrut(12)); // spacing konsisten
     }
 
+
     private void setActive(MenuButton active) {
         for (MenuButton b : buttons) b.setActive(b == active);
         repaint();
